@@ -1,0 +1,81 @@
+# Reusable grading workflow. Lives in the PUBLIC repo
+# resilience-in-the-cloud/autograder (published from autograder/ in the course monorepo).
+# Student repos call it from .github/workflows/grade.yml with their case name.
+# Canonical tests/policies are applied over the student's copies before scoring,
+# so editing tests in a student repo cannot change the grade.
+# This score is FEEDBACK ONLY: a team can edit its own caller workflow, so the official
+# score comes from grade-all.sh (see README.md).
+name: grade
+
+on:
+  workflow_call:
+    inputs:
+      case:
+        description: "Case folder name, e.g. week-01-balance-lookup"
+        required: true
+        type: string
+      autograder_ref:
+        required: false
+        type: string
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out submission
+        uses: actions/checkout@v4
+        with:
+          path: submission
+
+      - name: Check out autograder
+        uses: actions/checkout@v4
+        with:
+          repository: resilience-in-the-cloud/autograder
+          ref: ${{ inputs.autograder_ref }}
+          path: autograder
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.14.9"
+          terraform_wrapper: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install linters and policy tools
+        run: |
+          set -euo pipefail
+          curl -fsSL https://github.com/terraform-linters/tflint/releases/download/v0.55.0/tflint_linux_amd64.zip -o /tmp/tflint.zip
+          sudo unzip -oq /tmp/tflint.zip -d /usr/local/bin
+          curl -fsSL https://github.com/open-policy-agent/conftest/releases/download/v0.56.0/conftest_0.56.0_Linux_x86_64.tar.gz | sudo tar xz -C /usr/local/bin conftest
+          # Pinned tools only. A team's requirements-dev.txt is NOT installed: a package there
+          # could register a pytest plugin and rewrite results. The canonical tests need only pytest.
+          python -m pip install --quiet "checkov==3.4.3" "pytest==8.3.4"
+
+      - name: Score
+        env:
+          PYTHON: python
+          CASE: ${{ inputs.case }}  # via env, never spliced into the script
+        run: |
+          set -euo pipefail
+          if ! [[ "$CASE" =~ ^week-[0-9]{2}-[a-z0-9-]+$ ]] || [ ! -d "autograder/cases/$CASE" ]; then
+            echo "::error::Unknown case '$CASE'. Expected a folder in autograder/cases/." >&2
+            exit 1
+          fi
+          python autograder/score.py \
+            --repo submission \
+            --overlay "autograder/cases/$CASE" \
+            --out grade-report
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grade-report
+          path: grade-report.*

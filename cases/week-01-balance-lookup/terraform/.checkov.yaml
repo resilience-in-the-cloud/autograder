@@ -1,0 +1,16 @@
+# Accepted classroom trade-offs for week 1. In your proposal, say which of
+# these you would NOT accept for a production bank system, and why.
+framework:
+  - terraform
+skip-check:
+  - CKV_AWS_258  # reason: demo function URL has no auth; production would use IAM/Cognito/API Gateway authorizer
+  - CKV_AWS_301  # reason: public invoke permission is required for an unauthenticated function URL (demo only)
+  - CKV_AWS_117  # reason: no VPC until week 5
+  - CKV_AWS_116  # reason: synchronous invoke via URL - a Lambda DLQ only applies to async invokes (revisit week 7)
+  - CKV_AWS_173  # reason: env vars hold no secrets (Secrets Manager arrives week 6)
+  - CKV_AWS_272  # reason: code signing needs a signing profile - out of scope
+  - CKV_AWS_115  # reason: reserved concurrency is a week 3 topic (throttling)
+  - CKV_AWS_158  # reason: KMS-encrypted log groups need a customer key - cost/complexity out of scope
+  - CKV_AWS_338  # reason: 7-day retention keeps Academy cost down; banks often need 1+ year (FFIEC) - discuss
+  - CKV_AWS_26   # reason: SNS topic carries alarm metadata only, no customer data
+  - CKV_AWS_50   # reason: X-Ray tracing is a week 12 observability topic

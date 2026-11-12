@@ -1,0 +1,10 @@
+{
+  "_comment": "Week 1 rubric weights (points out of 100). The new work this week is observability: alarms that notify someone. Unused categories are redistributed.",
+  "observability": 50,
+  "resilience": 15,
+  "iac-quality": 15,
+  "tests": 10,
+  "security": 5,
+  "cost": 3,
+  "academy": 2
+}

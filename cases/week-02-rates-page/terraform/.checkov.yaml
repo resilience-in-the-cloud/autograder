@@ -1,0 +1,16 @@
+# Accepted classroom trade-offs for week 2. In your proposal, say which of
+# these you would NOT accept for a production bank website, and why.
+framework:
+  - terraform
+skip-check:
+  - CKV_AWS_144  # reason: cross-region replication - Academy lab keeps both buckets in one region; production replica belongs in a second region (discuss)
+  - CKV_AWS_145  # reason: SSE-S3 (AES256) is enough for public marketing content; SSE-KMS with OAC needs a customer key + key policy
+  - CKV_AWS_18   # reason: S3 server access logs need a separate log bucket - cost/complexity beyond week 2 (CloudWatch metrics cover the demo)
+  - CKV2_AWS_62  # reason: no consumer for S3 event notifications in this design
+  - CKV_AWS_86   # reason: CloudFront standard logs need an ACL-enabled log bucket; metrics + alarms are this week's observability
+  - CKV_AWS_68   # reason: AWS WAF web ACL adds monthly cost per ACL + rules; static public content, revisit for apps that take input
+  - CKV2_AWS_47  # reason: depends on WAF (see CKV_AWS_68); Log4j rules are irrelevant to a static S3 origin
+  - CKV2_AWS_42  # reason: custom SSL certificate needs a custom domain (Route 53/ACM) - not available in AWS Academy
+  - CKV_AWS_174  # reason: TLSv1.2 minimum requires a custom certificate (see CKV2_AWS_42); the default *.cloudfront.net cert cannot set it
+  - CKV_AWS_374  # reason: no geo restriction - NNB customers travel and must see rates from anywhere
+  - CKV_AWS_26   # reason: SNS topic carries alarm metadata only, no customer data

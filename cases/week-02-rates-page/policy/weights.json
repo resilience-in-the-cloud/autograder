@@ -1,0 +1,10 @@
+{
+  "_comment": "Week 2 rubric weights (points out of 100). The new work this week is resilience: replica bucket, origin-group failover, versioning, maintenance page. Unused categories are redistributed.",
+  "resilience": 45,
+  "security": 15,
+  "observability": 15,
+  "iac-quality": 10,
+  "tests": 8,
+  "cost": 4,
+  "academy": 3
+}

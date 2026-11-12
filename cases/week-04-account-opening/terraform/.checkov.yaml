@@ -1,0 +1,14 @@
+# Accepted classroom trade-offs for week 4. In your proposal, say which of
+# these you would NOT accept for a production bank system, and why.
+framework:
+  - terraform
+skip-check:
+  - CKV_AWS_2    # reason: HTTP-only listener - Academy has no domain/Route 53, so no ACM certificate; production = HTTPS on 443
+  - CKV_AWS_103  # reason: TLS policy only applies to an HTTPS listener (none, see CKV_AWS_2)
+  - CKV2_AWS_20  # reason: HTTP->HTTPS redirect needs an HTTPS listener (none, see CKV_AWS_2)
+  - CKV_AWS_378  # reason: ALB->instance traffic is HTTP inside the VPC; end-to-end TLS is out of scope this week
+  - CKV_AWS_260  # reason: port 80 open to the internet only on the ALB SG (instances accept the ALB SG only; checkov flags the SG-referenced rule too)
+  - CKV_AWS_150  # reason: ALB deletion protection off so teardown.sh is one command; production = on (policy warns)
+  - CKV_AWS_91   # reason: ALB access logs need an S3 bucket + ELB bucket policy - week 10 (data lake) topic; CloudWatch metrics cover this lab
+  - CKV2_AWS_28  # reason: WAF costs ~$5/month + rules; out of scope (discuss for a public bank form)
+  - CKV_AWS_26   # reason: SNS topic carries alarm metadata only, no customer data

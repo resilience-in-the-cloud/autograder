@@ -1,0 +1,10 @@
+{
+  "_comment": "Week 4 rubric weights (points out of 100). The new work this week is resilience: multi-AZ, load-balancer health checks, self-healing and scaling. Unused categories are redistributed.",
+  "resilience": 50,
+  "observability": 15,
+  "iac-quality": 10,
+  "tests": 10,
+  "security": 8,
+  "cost": 4,
+  "academy": 3
+}

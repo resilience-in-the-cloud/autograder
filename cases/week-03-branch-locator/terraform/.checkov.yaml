@@ -1,0 +1,15 @@
+# Accepted classroom trade-offs for week 3. In your proposal, say which of
+# these you would NOT accept for a production bank system, and why.
+framework:
+  - terraform
+skip-check:
+  - CKV_AWS_309  # reason: public, anonymous branch directory - no auth by design; throttling is the abuse control (WAF/authorizer in prod if needed)
+  - CKV_AWS_119  # reason: AWS-managed KMS key (aws/dynamodb) is used; a customer-managed CMK costs $1/month and needs key policy work - out of scope
+  - CKV_AWS_158  # reason: KMS-encrypted log groups need a customer key - cost/complexity out of scope
+  - CKV_AWS_338  # reason: 7-day retention keeps Academy cost down; banks often need 1+ year (FFIEC) - discuss
+  - CKV_AWS_117  # reason: no VPC until week 5 (DynamoDB would then use a gateway endpoint)
+  - CKV_AWS_116  # reason: synchronous invoke via API Gateway - a Lambda DLQ only applies to async invokes (revisit week 7)
+  - CKV_AWS_173  # reason: env vars hold no secrets (table name, timeouts) - Secrets Manager arrives week 6
+  - CKV_AWS_272  # reason: code signing needs a signing profile - out of scope
+  - CKV_AWS_26   # reason: SNS topic carries alarm metadata only, no customer data
+  - CKV_AWS_50   # reason: X-Ray tracing is a week 12 observability topic
